@@ -37,9 +37,8 @@ class TouchableImage extends Component {
     render() {
         const { image, orientation } = this.props;
 
-        const uri = image.link.replace('http://', 'https://');
-
-        console.log(toJS(image));
+        const uri = image.link.replace('http://', 'https://'),
+              caption = image.title || image.description;
 
         return (
             <TouchableHighlight onPress={this.onPress.bind(this)}
@@ -47,10 +46,34 @@ class TouchableImage extends Component {
                 <Image source={{uri: uri}}
                        style={[styles.backgroundImage, styles[orientation.toLowerCase()]]}
                        onLayout={this.onImageLayout.bind(this)}>
-                    <Text style={styles.imageLabel}>{image.title}</Text>
+                    <Text style={styles.imageLabel}>{caption}</Text>
                 </Image>
             </TouchableHighlight>
         );
+    }
+}
+
+@inject('store') @observer
+class Album extends Component {
+    componentWillMount() {
+        const { store, albumID } = this.props;
+
+        store.fetchAlbum(albumID);
+    }
+
+    render () {
+        const { store, albumID } = this.props,
+              album = store.albums.get(albumID);
+
+        if (album) {
+            console.log(toJS(album));
+            return (
+                <TouchableImage image={album.images[0]}
+                                orientation={store.orientation} />
+            );
+        }else{
+            return null;
+        }
     }
 }
 
@@ -63,10 +86,17 @@ class ImageCarousel extends Component {
             return null;
         }
 
-        return (
-            <TouchableImage image={store.currentImage}
-                            orientation={store.orientation} />
-        );
+        if (store.currentImage.is_album) {
+            return (
+                <Album albumID={store.currentImage.id}
+                       orientation={store.orientation} />
+            );
+        }else{
+            return (
+                <TouchableImage image={store.currentImage}
+                                orientation={store.orientation} />
+            );
+        }
     }
 }
 

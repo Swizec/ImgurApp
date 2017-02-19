@@ -17,6 +17,7 @@ class Store {
     @observable images = [];
     @observable index = 0;
     @observable galleryPage = 0;
+    @observable albums = new observable.map();
 
     @action changeOrientation(orientation) {
         this.orientation = orientation;
@@ -40,13 +41,26 @@ class Store {
     }
 
     @action fetchImages() {
-        fetch(`${IMGUR_URL}gallery/hot/viral/${this.galleryPage}.json`)
+        fetch(`${IMGUR_URL}gallery/hot/viral/${this.galleryPage}`)
           .then(fetch.throwErrors)
           .then(res => res.json())
           .then(json => {
               json.data.forEach(img => this.images.push(img));
           })
           .catch(err => console.log('ERROR', err.message));
+    }
+
+    @action fetchAlbum(id) {
+        if (!this.albums.has(id)) {
+            fetch(`${IMGUR_URL}album/${id}`)
+              .then(fetch.throwErrors)
+              .then(res => res.json())
+              .then(json => {
+                  console.log('loaded', json.data.id);
+                  this.albums.set(json.data.id, json.data);
+              })
+              .catch(err => console.log('ERROR', err.message));
+        }
     }
 
     @computed get currentImage() {
