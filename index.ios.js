@@ -13,22 +13,37 @@ import {
   Image
 } from 'react-native';
 
-import ImageCarousel from './components/Carousel';
+import { Provider as MobXProvider, observer } from 'mobx-react/native';
 
-export default class ImgurApp extends Component {
-  render() {
-    return (
-        <View style={styles.container}>
-            <ImageCarousel />
-        </View>
-    );
-  }
+import ImageCarousel from './components/Carousel';
+import { LANDSCAPE, PORTRAIT } from './Constants';
+import Store from './Store';
+
+@observer
+class ImgurApp extends Component {
+    onLayout(event) {
+        const { width, height } = event.nativeEvent.layout;
+        const orientation = ( width > height ) ? LANDSCAPE : PORTRAIT;
+
+        Store.changeOrientation(orientation);
+    }
+
+    render() {
+        return (
+            <MobXProvider store={Store}>
+                <View style={styles.container}
+                      onLayout={this.onLayout.bind(this)}>
+                    <ImageCarousel />
+                </View>
+            </MobXProvider>
+        );
+    }
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F5FCFF',
+        backgroundColor: 'black',
     },
     empty: {
         flex: 1
@@ -36,3 +51,4 @@ const styles = StyleSheet.create({
 });
 
 AppRegistry.registerComponent('ImgurApp', () => ImgurApp);
+export default ImgurApp;

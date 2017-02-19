@@ -1,0 +1,8 @@
+
+const LANDSCAPE = 'LANDSCAPE',
+      PORTRAIT = 'PORTRAIT'
+
+export {
+    LANDSCAPE,
+    PORTRAIT
+}
