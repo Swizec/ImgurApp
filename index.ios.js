@@ -26,6 +26,7 @@ class ImgurApp extends Component {
         const orientation = ( width > height ) ? LANDSCAPE : PORTRAIT;
 
         Store.changeOrientation(orientation);
+        Store.updateScreenSize(width, height);
     }
 
     componentWillMount() {

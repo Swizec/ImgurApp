@@ -37,7 +37,7 @@ class TouchableImage extends Component {
     }
 
     render() {
-        const { image, store } = this.props;
+        const { image, store, height } = this.props;
 
         const uri = image.link.replace('http://', 'https://'),
               caption = image.title || image.description;
@@ -46,7 +46,9 @@ class TouchableImage extends Component {
             <TouchableHighlight onPress={this.onPress.bind(this)}
                                 style={styles.fullscreen}>
                 <Image source={{uri: uri}}
-                       style={[styles.backgroundImage, styles[store.orientation.toLowerCase()]]}
+                       style={[styles.backgroundImage,
+                               styles[store.orientation.toLowerCase()],
+                               {height: height || null}]}
                        onLayout={this.onImageLayout.bind(this)}>
                     <Text style={styles.imageLabel}>{caption}</Text>
                 </Image>
@@ -77,8 +79,13 @@ class Album extends Component {
     }
 
     renderRow(img) {
+        const { store } = this.props;
+
+        console.log(store.screenSize.height);
+
         return (
-            <TouchableImage image={img} />
+            <TouchableImage image={img}
+                            height={store.screenSize.height} />
         )
     }
 
