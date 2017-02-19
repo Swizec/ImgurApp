@@ -59,7 +59,7 @@ class Store {
                   console.log('loaded', json.data.id);
                   this.albums.set(json.data.id, json.data);
               })
-              .catch(err => console.log('ERROR', err.message));
+              .catch(err => console.log('ERROR', err.message, err));
         }
     }
 

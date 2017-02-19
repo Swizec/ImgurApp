@@ -5,9 +5,11 @@ import {
     Text,
     StyleSheet,
     Image,
-    TouchableHighlight
+    TouchableHighlight,
+    ListView
 } from 'react-native';
-import { toJS } from 'mobx';
+
+import { toJS, when } from 'mobx';
 import { inject, observer } from 'mobx-react/native';
 
 @inject('store') @observer
@@ -35,7 +37,7 @@ class TouchableImage extends Component {
     }
 
     render() {
-        const { image, orientation } = this.props;
+        const { image, store } = this.props;
 
         const uri = image.link.replace('http://', 'https://'),
               caption = image.title || image.description;
@@ -44,7 +46,7 @@ class TouchableImage extends Component {
             <TouchableHighlight onPress={this.onPress.bind(this)}
                                 style={styles.fullscreen}>
                 <Image source={{uri: uri}}
-                       style={[styles.backgroundImage, styles[orientation.toLowerCase()]]}
+                       style={[styles.backgroundImage, styles[store.orientation.toLowerCase()]]}
                        onLayout={this.onImageLayout.bind(this)}>
                     <Text style={styles.imageLabel}>{caption}</Text>
                 </Image>
@@ -61,16 +63,45 @@ class Album extends Component {
         store.fetchAlbum(albumID);
     }
 
+    get dataSource() {
+        const { store, albumID } = this.props,
+              ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1.id !== r2.id});
+
+        return ds.cloneWithRows(toJS(this.album.images));
+    }
+
+    get album() {
+        const { store, albumID } = this.props;
+
+        return store.albums.get(albumID);
+    }
+
+    renderRow(img) {
+        return (
+            <TouchableImage image={img} />
+        )
+    }
+
+    renderHeader() {
+        return (
+            <Text style={styles.header}>{this.album.title}</Text>
+        );
+    }
+
     render () {
         const { store, albumID } = this.props,
               album = store.albums.get(albumID);
 
         if (album) {
-            console.log(toJS(album));
             return (
-                <TouchableImage image={album.images[0]}
-                                orientation={store.orientation} />
+                <View style={styles.fullscreen}>
+                    <ListView dataSource={this.dataSource}
+                              renderRow={this.renderRow.bind(this)}
+                              renderHeader={this.renderHeader.bind(this)}
+                              style={styles.fullscreen} />
+                </View>
             );
+
         }else{
             return null;
         }
@@ -124,6 +155,13 @@ const styles = StyleSheet.create({
         color: 'white',
         padding: 10
     },
+    header: {
+        textAlign: 'center',
+        color: 'white',
+        padding: 10,
+        fontSize: 16,
+        fontWeight: 'bold'
+    }
 });
 
 export default ImageCarousel;
