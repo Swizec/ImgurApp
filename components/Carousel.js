@@ -15,7 +15,8 @@ import { inject, observer } from 'mobx-react/native';
 @inject('store') @observer
 class TouchableImage extends Component {
     state = {
-        width: null
+        width: null,
+        hideCaption: false
     }
 
     onPress(event) {
@@ -23,11 +24,23 @@ class TouchableImage extends Component {
               { store } = this.props,
               X = event.nativeEvent.locationX;
 
-        if (X < width/2) {
+        if (X < width*.3) {
             store.prevImage();
-        }else{
+        }else if (X > width*.6) {
             store.nextImage();
         }
+    }
+
+    onPressIn(event) {
+        this.setState({
+            hideCaption: true
+        });
+    }
+
+    onPressOut(event) {
+        this.setState({
+            hideCaption: false
+        });
     }
 
     onImageLayout(event) {
@@ -36,24 +49,28 @@ class TouchableImage extends Component {
         });
     }
 
+    get caption() {
+        let { caption, image } = this.props;
+        return image.title || image.description || caption;
+    }
+
     render() {
-        const { image, store, height } = this.props;
-
-        let { caption } = this.props;
-
-        const uri = image.link.replace('http://', 'https://');
-
-        caption = image.title || image.description || caption;
+        const { image, store, height } = this.props,
+              uri = image.link.replace('http://', 'https://'),
+              hideCaption = this.state.hideCaption ? styles.hiddenLabel : null;
 
         return (
             <TouchableHighlight onPress={this.onPress.bind(this)}
+                                onPressIn={this.onPressIn.bind(this)}
+                                onPressOut={this.onPressOut.bind(this)}
                                 style={styles.fullscreen}>
                 <Image source={{uri: uri}}
                        style={[styles.backgroundImage,
                                styles[store.orientation.toLowerCase()],
                                {height: height || null}]}
                        onLayout={this.onImageLayout.bind(this)}>
-                    <Text style={styles.imageLabel}>{caption}</Text>
+                    {this.caption ? <Text style={[styles.imageLabel, hideCaption]}>{this.caption}</Text>
+                                  : null}
                 </Image>
             </TouchableHighlight>
         );
@@ -76,7 +93,9 @@ class Album extends Component {
 
     get dataSource() {
         const { store, albumID } = this.props,
-              ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1.id !== r2.id});
+              ds = new ListView.DataSource({
+                  rowHasChanged: (r1, r2) => r1.id !== r2.id
+              });
 
         return ds.cloneWithRows(toJS(this.album.images));
     }
@@ -87,12 +106,18 @@ class Album extends Component {
         return store.albums.get(albumID);
     }
 
-    renderRow(img, caption = null) {
+    renderRow(img, caption) {
         const { store } = this.props;
+
+        let height = store.screenSize.height;
+
+        if (img.height < height) {
+            height = img.height;
+        }
 
         return (
             <TouchableImage image={img}
-                            height={store.screenSize.height}
+                            height={height}
                             caption={caption} />
         )
     }
@@ -112,7 +137,7 @@ class Album extends Component {
                 return (
                     <View style={styles.fullscreen}>
                         <ListView dataSource={this.dataSource}
-                                  renderRow={this.renderRow.bind(this)}
+                                  renderRow={img => this.renderRow(img)}
                                   renderHeader={this.renderHeader.bind(this)}
                                   style={styles.fullscreen} />
                     </View>
@@ -172,6 +197,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(100, 100, 100, 0.5)',
         color: 'white',
         padding: 10
+    },
+    hiddenLabel: {
+        opacity: 0.3
     },
     header: {
         textAlign: 'center',
