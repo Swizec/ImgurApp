@@ -7,9 +7,10 @@ import {
     Image,
     TouchableHighlight
 } from 'react-native';
+import { toJS } from 'mobx';
 import { inject, observer } from 'mobx-react/native';
 
-@inject('store')
+@inject('store') @observer
 class TouchableImage extends Component {
     state = {
         width: null
@@ -36,13 +37,17 @@ class TouchableImage extends Component {
     render() {
         const { image, orientation } = this.props;
 
+        const uri = image.link.replace('http://', 'https://');
+
+        console.log(toJS(image));
+
         return (
             <TouchableHighlight onPress={this.onPress.bind(this)}
                                 style={styles.fullscreen}>
-                <Image source={{uri: image.uri}}
+                <Image source={{uri: uri}}
                        style={[styles.backgroundImage, styles[orientation.toLowerCase()]]}
                        onLayout={this.onImageLayout.bind(this)}>
-                    <Text style={styles.imageLabel}>{image.label}</Text>
+                    <Text style={styles.imageLabel}>{image.title}</Text>
                 </Image>
             </TouchableHighlight>
         );
@@ -52,11 +57,14 @@ class TouchableImage extends Component {
 @inject('store') @observer
 class ImageCarousel extends Component {
     render() {
-        const { image, store } = this.props;
+        const { store } = this.props;
+
+        if (!store.currentImage) {
+            return null;
+        }
 
         return (
-            <TouchableImage image={{uri: "https://i.imgur.com/6cFNnJp.jpg",
-                                    label: "Its my cake day, why am i happier about this then my real birthday, i will never know. First fav. Post"}}
+            <TouchableImage image={store.currentImage}
                             orientation={store.orientation} />
         );
     }

@@ -7,7 +7,9 @@
     "test": "jest"
   },
   "dependencies": {
+    "babel-preset-latest": "^6.22.0",
     "babel-preset-react-native-stage-0": "^1.0.1",
+    "better-fetch": "^1.1.0",
     "mobx": "^3.1.0",
     "mobx-react": "^4.1.0",
     "react": "15.4.2",

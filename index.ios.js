@@ -28,6 +28,10 @@ class ImgurApp extends Component {
         Store.changeOrientation(orientation);
     }
 
+    componentWillMount() {
+        Store.fetchImages();
+    }
+
     render() {
         return (
             <MobXProvider store={Store}>
