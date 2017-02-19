@@ -39,8 +39,11 @@ class TouchableImage extends Component {
     render() {
         const { image, store, height } = this.props;
 
-        const uri = image.link.replace('http://', 'https://'),
-              caption = image.title || image.description;
+        let { caption } = this.props;
+
+        const uri = image.link.replace('http://', 'https://');
+
+        caption = image.title || image.description || caption;
 
         return (
             <TouchableHighlight onPress={this.onPress.bind(this)}
@@ -65,6 +68,12 @@ class Album extends Component {
         store.fetchAlbum(albumID);
     }
 
+    componentWillReceiveProps(newProps) {
+        const { store, albumID } = newProps;
+
+        store.fetchAlbum(albumID);
+    }
+
     get dataSource() {
         const { store, albumID } = this.props,
               ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1.id !== r2.id});
@@ -78,14 +87,13 @@ class Album extends Component {
         return store.albums.get(albumID);
     }
 
-    renderRow(img) {
+    renderRow(img, caption = null) {
         const { store } = this.props;
-
-        console.log(store.screenSize.height);
 
         return (
             <TouchableImage image={img}
-                            height={store.screenSize.height} />
+                            height={store.screenSize.height}
+                            caption={caption} />
         )
     }
 
@@ -100,15 +108,18 @@ class Album extends Component {
               album = store.albums.get(albumID);
 
         if (album) {
-            return (
-                <View style={styles.fullscreen}>
-                    <ListView dataSource={this.dataSource}
-                              renderRow={this.renderRow.bind(this)}
-                              renderHeader={this.renderHeader.bind(this)}
-                              style={styles.fullscreen} />
-                </View>
-            );
-
+            if (album.images.length > 1) {
+                return (
+                    <View style={styles.fullscreen}>
+                        <ListView dataSource={this.dataSource}
+                                  renderRow={this.renderRow.bind(this)}
+                                  renderHeader={this.renderHeader.bind(this)}
+                                  style={styles.fullscreen} />
+                    </View>
+                );
+            }else{
+                return this.renderRow(album.images[0], album.title);
+            }
         }else{
             return null;
         }
