@@ -15,7 +15,7 @@ import {
 
 import { Provider as MobXProvider, observer } from 'mobx-react/native';
 
-import ImageCarousel from './components/Carousel';
+import ImgurCarousel from './components/ImgurCarousel';
 import { LANDSCAPE, PORTRAIT } from './Constants';
 import Store from './Store';
 
@@ -38,7 +38,7 @@ class ImgurApp extends Component {
             <MobXProvider store={Store}>
                 <View style={styles.container}
                       onLayout={this.onLayout.bind(this)}>
-                    <ImageCarousel />
+                    <ImgurCarousel />
                 </View>
             </MobXProvider>
         );
