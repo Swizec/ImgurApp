@@ -6,23 +6,14 @@ import {
     StyleSheet
 } from 'react-native';
 
+import styles from './styles';
+
 const Spinner = () => (
-    <View style={styles.flex1}>
+    <View style={[styles.fullscreen, styles.centered]}>
         <Image source={require('./img/heart.gif')}
-               style={styles.spinner} />
+               style={{width: 100, height: 100}} />
     </View>
 );
 
-const styles = StyleSheet.create({
-    flex1: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    spinner: {
-        height: 100,
-        width: 100
-    }
-});
 
 export default Spinner;

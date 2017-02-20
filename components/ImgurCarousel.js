@@ -29,13 +29,11 @@ class ImgurCarousel extends Component {
 
         if (store.currentImage.is_album) {
             return (
-                <Album albumID={store.currentImage.id}
-                       orientation={store.orientation} />
+                <Album albumID={store.currentImage.id} />
             );
         }else{
             return (
-                <TouchableImage image={store.currentImage}
-                                orientation={store.orientation} />
+                <TouchableImage image={store.currentImage} />
             );
         }
     }

@@ -36,6 +36,10 @@ const styles = StyleSheet.create({
         padding: 10,
         fontSize: 16,
         fontWeight: 'bold'
+    },
+    centered: {
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
 
