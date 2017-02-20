@@ -12,6 +12,8 @@ import {
 import { toJS, when } from 'mobx';
 import { inject, observer } from 'mobx-react/native';
 
+import Spinner from './Spinner';
+
 @inject('store') @observer
 class TouchableImage extends Component {
     state = {
@@ -146,7 +148,7 @@ class Album extends Component {
                 return this.renderRow(album.images[0], album.title);
             }
         }else{
-            return null;
+            return (<Spinner />);
         }
     }
 }
@@ -157,7 +159,7 @@ class ImageCarousel extends Component {
         const { store } = this.props;
 
         if (!store.currentImage) {
-            return null;
+            return (<Spinner />);
         }
 
         if (store.currentImage.is_album) {
